@@ -9,11 +9,14 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.serialization.json.Json
+import org.example.databaseFactory.connectToDatabase
 import org.example.route.waitingRoom
 import java.time.Duration
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 fun main() {
+    connectToDatabase()
+
     embeddedServer(Netty, port = 8080) {
         install(ContentNegotiation) {
             json()

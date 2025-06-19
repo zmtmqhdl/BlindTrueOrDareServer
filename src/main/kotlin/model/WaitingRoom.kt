@@ -3,14 +3,14 @@ package org.example.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class User(
-    val userId: String,
+data class Player(
+    val playerId: String,
     val nickname: String
 )
 
 @Serializable
 data class CreateWaitingRoomRequest(
-    val user: User
+    val player: Player
 )
 
 @Serializable
@@ -23,7 +23,7 @@ data class CreateWaitingRoomResponse(
 data class WaitingRoom(
     val roomId: String,
     val hostId: String,
-    val participantList: List<User>,
+    val participantList: List<Player>,
     val status: WaitingRoomStatus
 )
 
@@ -31,7 +31,7 @@ data class WaitingRoom(
 data class WaitingRoomDto(
     val roomId: String,
     val hostId: String,
-    val participantList: List<User>,
+    val participantList: List<Player>,
     val status: WaitingRoomStatus
 )
 
