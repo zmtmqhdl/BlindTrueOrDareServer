@@ -21,7 +21,6 @@ fun Route.waitingRoom() {
                 call.respond(HttpStatusCode.Created, CreateWaitingRoomResponse(id))
 
             } catch (e: Exception) {
-                println("🚨 역직렬화 실패: ${e.message}")
                 call.respondText("Bad Request: ${e.message}", status = io.ktor.http.HttpStatusCode.BadRequest)
             }
         }
