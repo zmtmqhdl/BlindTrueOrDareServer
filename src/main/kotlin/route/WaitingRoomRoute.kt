@@ -16,9 +16,9 @@ fun Route.waitingRoom() {
         post("/create") {
             try {
                 val request = call.receive<CreateWaitingRoomRequest>()
-                val id = UUID.randomUUID().toString()
-                roomStorage[id] = request
-                call.respond(HttpStatusCode.Created, CreateWaitingRoomResponse(id))
+                val waitingRoomId = UUID.randomUUID().toString()
+                roomStorage[waitingRoomId] = request
+                call.respond(HttpStatusCode.Created, CreateWaitingRoomResponse(waitingRoomId))
 
             } catch (e: Exception) {
                 call.respondText("Bad Request: ${e.message}", status = io.ktor.http.HttpStatusCode.BadRequest)

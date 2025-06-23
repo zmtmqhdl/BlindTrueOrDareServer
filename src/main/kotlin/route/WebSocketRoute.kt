@@ -16,32 +16,32 @@ fun Application.webSocketRoute() {
     routing {
         webSocket("/game") {
             val params = call.request.queryParameters
-            val roomId = params["roomId"]
-            val userId = params["userId"]
+            val waitingRoomId = params["waitingRoomId"]
+            val playerId = params["playerId"]
 
-            if (roomId == null || userId == null) {
+            if (waitingRoomId == null || playerId == null) {
                 close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Missing parameters"))
                 return@webSocket
             }
 
-            println("🔌 WebSocket 연결됨: user=$userId, room=$roomId")
+            println("🔌 WebSocket 연결됨: user=$playerId, room=$waitingRoomId")
 
             // 세션 등록
-            val sessions = roomSessions.getOrPut(roomId) { mutableSetOf() }
+            val sessions = roomSessions.getOrPut(waitingRoomId) { mutableSetOf() }
             sessions += this
 
-            send("✅ WebSocket 연결 완료: $userId")
+            send("✅ WebSocket 연결 완료: $playerId")
 
             try {
                 for (frame in incoming) {
                     if (frame is Frame.Text) {
                         val msg = frame.readText()
-                        println("💬 [$userId] 메시지: $msg")
+                        println("💬 [$playerId] 메시지: $msg")
 
                         // 같은 방의 다른 사용자에게 브로드캐스트
                         sessions.forEach { session ->
                             if (session != this) {
-                                session.send("[$userId]: $msg")
+                                session.send("[$playerId]: $msg")
                             }
                         }
                     }
@@ -49,7 +49,7 @@ fun Application.webSocketRoute() {
             } catch (e: Exception) {
                 println("⚠️ WebSocket 에러: $e")
             } finally {
-                println("🔌 연결 종료됨: $userId")
+                println("🔌 연결 종료됨: $playerId")
                 sessions -= this
             }
         }
