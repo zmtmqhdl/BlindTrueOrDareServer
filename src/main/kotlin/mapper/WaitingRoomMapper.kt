@@ -1,11 +1,9 @@
 package org.example.mapper
 
-import org.example.model.CreateWaitingRoomRequest
 import org.example.model.Player
 import org.example.model.PlayerDto
 import org.example.model.WaitingRoom
 import org.example.model.WaitingRoomDto
-import org.example.model.WaitingRoomStatus
 
 //fun CreateWaitingRoomRequest.toWaitingRoom(): WaitingRoom =
 //    WaitingRoom(
@@ -29,8 +27,8 @@ fun Player.toDto(): PlayerDto =
 
 fun WaitingRoom.toDto(): WaitingRoomDto =
     WaitingRoomDto(
-        roomId = roomId,
+        waitingRoomId = waitingRoomId,
         hostId = hostId,
         participantList = participantList.map { it.toDto()},
-        status = status
+        waitingRoomStatus = waitingRoomStatus
     )

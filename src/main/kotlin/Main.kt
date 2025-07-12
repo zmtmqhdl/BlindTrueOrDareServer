@@ -7,9 +7,7 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
-import io.ktor.websocket.*
-import kotlinx.serialization.json.Json
-import org.example.databaseFactory.connectToDatabase
+import org.example.database.connectToDatabase
 import org.example.route.waitingRoom
 import org.example.route.webSocketRoute
 import java.time.Duration

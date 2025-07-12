@@ -1,11 +1,7 @@
-package org.example.databaseFactory
+package org.example.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import org.example.database.ParticipantLists
-import org.example.database.Player
-import org.example.database.Question
-import org.example.database.WaitingRoom
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
