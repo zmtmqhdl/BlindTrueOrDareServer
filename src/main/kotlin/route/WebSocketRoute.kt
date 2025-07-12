@@ -9,39 +9,70 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import io.ktor.websocket.send
+import kotlinx.serialization.json.Json
+import org.example.mapper.toDomain
+import org.example.model.Player
+import org.example.model.PlayerDto
+import org.example.model.WaitingRoom
+import org.example.model.WaitingRoomData
+import org.example.model.WaitingRoomStatus
 
-val roomSessions = mutableMapOf<String, MutableSet<DefaultWebSocketServerSession>>()
+val roomSessions = mutableMapOf<String,WaitingRoomData>()
 
 fun Application.webSocketRoute() {
     routing {
-        webSocket("/game") {
+        webSocket("/createWaitingRoom") {
             val params = call.request.queryParameters
             val waitingRoomId = params["waitingRoomId"]
-            val playerId = params["playerId"]
 
-            if (waitingRoomId == null || playerId == null) {
+            val playerJson = params["player"]
+            val player: Player? = playerJson?.let {
+                try {
+                    Json.decodeFromString<PlayerDto>(it).toDomain()
+                } catch (e: Exception) {
+                    println("❌ Player 디코딩 실패: ${e.message}")
+                    null
+                }
+            }
+
+            if (waitingRoomId == null || player == null) {
                 close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Missing parameters"))
                 return@webSocket
             }
 
-            println("🔌 WebSocket 연결됨: user=$playerId, room=$waitingRoomId")
+            val roomData = roomSessions.getOrPut(waitingRoomId) {
+                WaitingRoomData(
+                    waitingRoom = WaitingRoom(
+                        roomId = waitingRoomId,
+                        hostId = player.playerId,
+                        participantList = mutableListOf(),
+                        status = WaitingRoomStatus.Waiting
+                    ),
+                    sessions = mutableSetOf()
+                )
+            }
+            println("$roomData")
 
-            // 세션 등록
-            val sessions = roomSessions.getOrPut(waitingRoomId) { mutableSetOf() }
-            sessions += this
+            if (!roomData.waitingRoom.participantList.map { it.playerId}.contains(player.playerId)) {
+                roomData.waitingRoom.participantList.add(player)
+            }
+            roomData.sessions += this
 
-            send("✅ WebSocket 연결 완료: $playerId")
+
+
+
+            send("✅ WebSocket 연결 완료: $player.playerId")
 
             try {
                 for (frame in incoming) {
                     if (frame is Frame.Text) {
                         val msg = frame.readText()
-                        println("💬 [$playerId] 메시지: $msg")
+                        println("💬 [$player.playerId] 메시지: $msg")
 
                         // 같은 방의 다른 사용자에게 브로드캐스트
-                        sessions.forEach { session ->
+                        roomData.sessions.forEach { session ->
                             if (session != this) {
-                                session.send("[$playerId]: $msg")
+                                session.send("[$player.playerId]: $msg")
                             }
                         }
                     }
@@ -49,8 +80,8 @@ fun Application.webSocketRoute() {
             } catch (e: Exception) {
                 println("⚠️ WebSocket 에러: $e")
             } finally {
-                println("🔌 연결 종료됨: $playerId")
-                sessions -= this
+                println("🔌 연결 종료됨: $player.playerId")
+                roomData.sessions -= this
             }
         }
     }

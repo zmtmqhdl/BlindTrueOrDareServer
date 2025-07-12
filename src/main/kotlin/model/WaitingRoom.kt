@@ -1,9 +1,16 @@
 package org.example.model
 
+import io.ktor.server.websocket.DefaultWebSocketServerSession
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Player(
+    val playerId: String,
+    val nickname: String
+)
+
+@Serializable
+data class PlayerDto(
     val playerId: String,
     val nickname: String
 )
@@ -19,11 +26,10 @@ data class CreateWaitingRoomResponse(
 )
 
 
-@Serializable
 data class WaitingRoom(
     val roomId: String,
     val hostId: String,
-    val participantList: List<Player>,
+    val participantList: MutableList<Player>,
     val status: WaitingRoomStatus
 )
 
@@ -31,8 +37,13 @@ data class WaitingRoom(
 data class WaitingRoomDto(
     val roomId: String,
     val hostId: String,
-    val participantList: List<Player>,
+    val participantList: List<PlayerDto>,
     val status: WaitingRoomStatus
+)
+
+data class WaitingRoomData(
+    val waitingRoom: WaitingRoom,
+    var sessions: MutableSet<DefaultWebSocketServerSession>
 )
 
 enum class WaitingRoomStatus {
