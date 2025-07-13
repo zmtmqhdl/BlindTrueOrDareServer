@@ -10,5 +10,5 @@ data class Message(
 )
 
 enum class MessageType {
-    Update,
+    Enter, Update,
 }

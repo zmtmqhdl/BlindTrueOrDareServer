@@ -59,6 +59,7 @@ fun Application.webSocketRoute() {
                 )
             }
             application.log.info("대기실 데이터: $currentWaitingRoom")
+            currentWaitingRoom.sessions += this
 
             // 새로운 유저 입장
             if (!currentWaitingRoom.waitingRoom.participantList.map { it.playerId}.contains(player.playerId)) {
@@ -69,7 +70,6 @@ fun Application.webSocketRoute() {
 
                 updateMessage(sessions = currentWaitingRoom.sessions, waitingRoom = currentWaitingRoom.waitingRoom)
             }
-            currentWaitingRoom.sessions += this
 
             application.log.info("✅ WebSocket 연결 완료: ${player.playerId}")
 
@@ -92,6 +92,7 @@ fun Application.webSocketRoute() {
             } finally {
                 application.log.info("🔌 연결 종료됨: ${player.playerId}")
                 currentWaitingRoom.sessions -= this
+                currentWaitingRoom.waitingRoom.participantList.remove(player)
                 updateMessage(sessions = currentWaitingRoom.sessions, waitingRoom = currentWaitingRoom.waitingRoom)
             }
         }
