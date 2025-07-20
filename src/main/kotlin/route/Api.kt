@@ -11,6 +11,7 @@ import org.example.model.CreateWaitingRoomResponse
 
 val roomStorage = mutableMapOf<String, CreateWaitingRoomRequest>()
 
+// 뭔가 이상하다? 왜? 저걸 하는가?
 fun Route.waitingRoom() {
     route("/waitingRoom") {
         post("/create") {
@@ -18,10 +19,12 @@ fun Route.waitingRoom() {
                 val request = call.receive<CreateWaitingRoomRequest>()
                 val waitingRoomId = IdGenerator()
                 roomStorage[waitingRoomId] = request
-                call.respond(HttpStatusCode.Created, CreateWaitingRoomResponse(waitingRoomId))
-
+                call.respond(HttpStatusCode.Created, CreateWaitingRoomResponse(
+                    waitingRoomId = waitingRoomId
+                    )
+                )
             } catch (e: Exception) {
-                call.respondText("Bad Request: ${e.message}", status = io.ktor.http.HttpStatusCode.BadRequest)
+                call.respondText("Bad Request: ${e.message}", status = HttpStatusCode.BadRequest)
             }
         }
     }

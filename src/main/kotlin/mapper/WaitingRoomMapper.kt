@@ -30,5 +30,5 @@ fun WaitingRoom.toDto(): WaitingRoomDto =
         waitingRoomId = waitingRoomId,
         hostId = hostId,
         participantList = participantList.map { it.toDto()},
-        waitingRoomStatus = waitingRoomStatus
+        waitingRoomStatus = waitingRoomStatus,
     )

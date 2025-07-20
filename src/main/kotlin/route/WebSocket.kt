@@ -53,7 +53,7 @@ fun Application.webSocketRoute() {
                         waitingRoomId = waitingRoomId,
                         hostId = player.playerId,
                         participantList = mutableListOf(),
-                        waitingRoomStatus = WaitingRoomStatus.Waiting
+                        waitingRoomStatus = WaitingRoomStatus.Waiting,
                     ),
                     sessions = mutableSetOf()
                 )
@@ -62,11 +62,9 @@ fun Application.webSocketRoute() {
             currentWaitingRoom.sessions += this
 
             // 새로운 유저 입장
-            if (!currentWaitingRoom.waitingRoom.participantList.map { it.playerId}.contains(player.playerId)) {
+            if (!currentWaitingRoom.waitingRoom.participantList.map { it.playerId }.contains(player.playerId)) {
                 currentWaitingRoom.waitingRoom.participantList.add(player)
                 application.log.info("플레이어 추가됨: ${player.playerId} -> 방 ID: $waitingRoomId")
-
-
 
                 updateMessage(sessions = currentWaitingRoom.sessions, waitingRoom = currentWaitingRoom.waitingRoom)
             }
@@ -97,6 +95,11 @@ fun Application.webSocketRoute() {
             }
         }
     }
+}
+
+suspend fun enterMessage(sessions: Set<DefaultWebSocketServerSession>, waitingRoom: WaitingRoom) {
+
+
 }
 
 suspend fun updateMessage(sessions: Set<DefaultWebSocketServerSession>, waitingRoom: WaitingRoom) {

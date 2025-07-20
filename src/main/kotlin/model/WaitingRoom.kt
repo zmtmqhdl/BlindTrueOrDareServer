@@ -30,7 +30,7 @@ data class WaitingRoom(
     val waitingRoomId: String,
     val hostId: String,
     val participantList: MutableList<Player>,
-    val waitingRoomStatus: WaitingRoomStatus
+    val waitingRoomStatus: WaitingRoomStatus,
 )
 
 @Serializable
@@ -38,7 +38,7 @@ data class WaitingRoomDto(
     val waitingRoomId: String,
     val hostId: String,
     val participantList: List<PlayerDto>,
-    val waitingRoomStatus: WaitingRoomStatus
+    val waitingRoomStatus: WaitingRoomStatus,
 )
 
 data class WaitingRoomData(
