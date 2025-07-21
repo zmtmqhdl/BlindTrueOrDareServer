@@ -1,5 +1,7 @@
 package org.example.mapper
 
+import org.example.model.Message
+import org.example.model.MessageDto
 import org.example.model.Player
 import org.example.model.PlayerDto
 import org.example.model.WaitingRoom
@@ -31,4 +33,11 @@ fun WaitingRoom.toDto(): WaitingRoomDto =
         hostId = hostId,
         participantList = participantList.map { it.toDto()},
         waitingRoomStatus = waitingRoomStatus,
+    )
+
+fun MessageDto.toDomain(): Message =
+    Message(
+        type = type,
+        data = data,
+        timestamp = timestamp
     )

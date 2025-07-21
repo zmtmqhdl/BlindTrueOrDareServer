@@ -10,11 +10,13 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import io.ktor.websocket.send
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.example.mapper.toDomain
 import org.example.mapper.toDto
 import org.example.model.Message
+import org.example.model.MessageDto
 import org.example.model.MessageType
 import org.example.model.Player
 import org.example.model.PlayerDto
@@ -74,13 +76,24 @@ fun Application.webSocketRoute() {
             try {
                 for (frame in incoming) {
                     if (frame is Frame.Text) {
-                        val msg = frame.readText()
-                        application.log.debug("💬 [${player.playerId}] 메시지: $msg")
+                        val messageJson = frame.readText()
+                        try {
+                            val message = Json.decodeFromString<MessageDto>(messageJson)
+
+                            when (message.type) {
+
+                            }
+
+
+                        } catch (e: Exception) {
+
+                        }
+
 
                         // 같은 방의 다른 사용자에게 브로드캐스트
                         currentWaitingRoom.sessions.forEach { session ->
                             if (session != this) {
-                                session.send("[${player.playerId}]: $msg")
+                                session.send("[${player.playerId}]: $messageJson")
                             }
                         }
                     }
@@ -97,15 +110,11 @@ fun Application.webSocketRoute() {
     }
 }
 
-suspend fun enterMessage(sessions: Set<DefaultWebSocketServerSession>, waitingRoom: WaitingRoom) {
-
-
-}
-
 suspend fun updateMessage(sessions: Set<DefaultWebSocketServerSession>, waitingRoom: WaitingRoom) {
     val message = Message(
-        type = MessageType.Update,
-        data = Json.encodeToString<WaitingRoomDto>(value = waitingRoom.toDto())
+        type = MessageType.UPDATE,
+        data = Json.encodeToString<WaitingRoomDto>(value = waitingRoom.toDto()),
+        timestamp = System.currentTimeMillis()
     )
     sessions.forEach {
         it.send(Json.encodeToString(value = message))
