@@ -30,7 +30,7 @@ data class WaitingRoom(
     val waitingRoomId: String,
     val hostId: String,
     val participantList: MutableList<Player>,
-    val waitingRoomStatus: WaitingRoomStatus,
+    var waitingRoomStatus: WaitingRoomStatus,
 )
 
 @Serializable
@@ -44,6 +44,17 @@ data class WaitingRoomDto(
 data class WaitingRoomData(
     val waitingRoom: WaitingRoom,
     var sessions: MutableSet<DefaultWebSocketServerSession>
+)
+
+data class QuestionRoomSetting (
+    val time: Long,
+    val number: Int
+)
+
+@Serializable
+data class QuestionRoomSettingDto (
+    val time: Long,
+    val number: Int
 )
 
 enum class WaitingRoomStatus {

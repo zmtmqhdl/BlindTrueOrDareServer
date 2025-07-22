@@ -70,7 +70,6 @@ fun Application.webSocketRoute() {
 
                 updateMessage(sessions = currentWaitingRoom.sessions, waitingRoom = currentWaitingRoom.waitingRoom)
             }
-
             application.log.info("✅ WebSocket 연결 완료: ${player.playerId}")
 
             try {
@@ -81,20 +80,17 @@ fun Application.webSocketRoute() {
                             val message = Json.decodeFromString<MessageDto>(messageJson)
 
                             when (message.type) {
+                                MessageType.SEND_START -> {
+                                    application.log.info("▶️ 게임 시작 요청 수신")
+                                    currentWaitingRoom.waitingRoom.waitingRoomStatus = WaitingRoomStatus.Playing
+                                    updateMessage(sessions = currentWaitingRoom.sessions, waitingRoom = currentWaitingRoom.waitingRoom)
+                                }
+                                else -> {
 
+                                }
                             }
-
-
                         } catch (e: Exception) {
 
-                        }
-
-
-                        // 같은 방의 다른 사용자에게 브로드캐스트
-                        currentWaitingRoom.sessions.forEach { session ->
-                            if (session != this) {
-                                session.send("[${player.playerId}]: $messageJson")
-                            }
                         }
                     }
                 }
@@ -119,4 +115,8 @@ suspend fun updateMessage(sessions: Set<DefaultWebSocketServerSession>, waitingR
     sessions.forEach {
         it.send(Json.encodeToString(value = message))
     }
+}
+
+suspend fun questionRoomSettingMessage(sessions: Set<DefaultWebSocketServerSession>, questionRoomSetting: QuestionRoomSetting) {
+
 }

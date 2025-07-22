@@ -4,6 +4,8 @@ import org.example.model.Message
 import org.example.model.MessageDto
 import org.example.model.Player
 import org.example.model.PlayerDto
+import org.example.model.QuestionRoomSetting
+import org.example.model.QuestionRoomSettingDto
 import org.example.model.WaitingRoom
 import org.example.model.WaitingRoomDto
 
@@ -40,4 +42,10 @@ fun MessageDto.toDomain(): Message =
         type = type,
         data = data,
         timestamp = timestamp
+    )
+
+fun QuestionRoomSetting.toDto(): QuestionRoomSettingDto =
+    QuestionRoomSettingDto(
+        time = time,
+        number = number
     )
