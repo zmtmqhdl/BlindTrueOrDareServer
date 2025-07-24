@@ -1,6 +1,6 @@
 package org.example.database
 
-import org.example.model.WaitingRoomStatus
+import org.example.model.RoomStatus
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 
@@ -13,7 +13,7 @@ object Player : Table("player") {
 
 object WaitingRoom : Table("waiting_room") {
     val roomId = uuid("room_id")
-    val waitingRoomStatus = enumerationByName("waiting_room_status", 10, WaitingRoomStatus::class)
+    val roomStatus = enumerationByName("waiting_room_status", 10, RoomStatus::class)
 }
 
 object ParticipantLists : Table("participant_list") {

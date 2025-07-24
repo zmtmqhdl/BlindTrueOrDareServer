@@ -1,21 +1,6 @@
 package org.example.mapper
 
-import org.example.model.Message
-import org.example.model.MessageDto
-import org.example.model.Player
-import org.example.model.PlayerDto
-import org.example.model.QuestionRoomSetting
-import org.example.model.QuestionRoomSettingDto
-import org.example.model.WaitingRoom
-import org.example.model.WaitingRoomDto
-
-//fun CreateWaitingRoomRequest.toWaitingRoom(): WaitingRoom =
-//    WaitingRoom(
-//        roomId =
-//        hostId = hostId,
-//        participantList = listOf(user),
-//        status = WaitingRoomStatus.Waiting
-//    )
+import org.example.model.*
 
 fun PlayerDto.toDomain(): Player =
     Player(
@@ -29,23 +14,38 @@ fun Player.toDto(): PlayerDto =
         nickname = nickname
     )
 
-fun WaitingRoom.toDto(): WaitingRoomDto =
-    WaitingRoomDto(
-        waitingRoomId = waitingRoomId,
+fun Room.toDto(): RoomDto =
+    RoomDto(
+        roomId = roomId,
         hostId = hostId,
         participantList = participantList.map { it.toDto()},
-        waitingRoomStatus = waitingRoomStatus,
+        roomStatus = roomStatus,
+        writeTime = writeTime,
+        questionNumber = questionNumber
     )
 
 fun MessageDto.toDomain(): Message =
     Message(
         type = type,
+        senderId = senderId,
         data = data,
         timestamp = timestamp
     )
 
-fun QuestionRoomSetting.toDto(): QuestionRoomSettingDto =
-    QuestionRoomSettingDto(
-        time = time,
-        number = number
+fun Message.toDto(): MessageDto =
+    MessageDto(
+        type = type,
+        senderId = senderId,
+        data = data,
+        timestamp = timestamp
+    )
+
+fun RoomDto.toDomain(): Room =
+    Room(
+        roomId = roomId,
+        hostId = hostId,
+        participantList = participantList.map { it.toDomain() }.toMutableList(),
+        roomStatus = roomStatus,
+        writeTime = writeTime,
+        questionNumber = questionNumber
     )

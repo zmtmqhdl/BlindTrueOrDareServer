@@ -6,21 +6,21 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.example.model.CreateWaitingRoomRequest
-import org.example.model.CreateWaitingRoomResponse
+import org.example.model.CreateRoomRequest
+import org.example.model.CreateRoomResponse
 
-val roomStorage = mutableMapOf<String, CreateWaitingRoomRequest>()
+val roomStorage = mutableMapOf<String, CreateRoomRequest>()
 
 // 뭔가 이상하다? 왜? 저걸 하는가?
-fun Route.waitingRoom() {
-    route("/waitingRoom") {
+fun Route.room() {
+    route("/room") {
         post("/create") {
             try {
-                val request = call.receive<CreateWaitingRoomRequest>()
-                val waitingRoomId = IdGenerator()
-                roomStorage[waitingRoomId] = request
-                call.respond(HttpStatusCode.Created, CreateWaitingRoomResponse(
-                    waitingRoomId = waitingRoomId
+                val request = call.receive<CreateRoomRequest>()
+                val roomId = IdGenerator()
+                roomStorage[roomId] = request
+                call.respond(HttpStatusCode.Created, CreateRoomResponse(
+                    roomId = roomId
                     )
                 )
             } catch (e: Exception) {
