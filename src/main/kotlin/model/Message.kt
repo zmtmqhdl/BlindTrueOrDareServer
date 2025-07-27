@@ -18,5 +18,5 @@ data class MessageDto(
 )
 
 enum class MessageType {
-    UPDATE, SEND_START, START
+    UPDATE, SEND_START, SEND_WRITE_END, SEND_ANSWER_END
 }

@@ -69,14 +69,19 @@ fun Application.webSocketRoute() {
 
                             when (message.type) {
                                 MessageType.SEND_START -> {
-                                    application.log.info("▶️ 게임 시작 요청 수신")
-                                    application.log.info("${message.senderId}    ${currentRoom.room.hostId}")
+                                    application.log.info("▶️ 시작 메시지 수신")
                                     if (message.senderId == currentRoom.room.hostId) {
                                         currentRoom.room.roomStatus = RoomStatus.WRITE
                                         currentRoom.room.writeTime = 3600L
                                         currentRoom.room.questionNumber = 3
                                         updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
                                     }
+                                }
+                                MessageType.SEND_WRITE_END -> {
+                                    application.log.info("▶️ 질문 작성 완료 메시지 수신 ${message.senderId}")
+                                }
+                                MessageType.SEND_ANSWER_END -> {
+                                    application.log.info("▶️ 답변 완료 메시지 수신 ${message.senderId}")
                                 }
 
                                 else -> {
