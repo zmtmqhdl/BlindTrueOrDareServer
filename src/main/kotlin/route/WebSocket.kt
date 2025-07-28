@@ -40,12 +40,14 @@ fun Application.webSocketRoute() {
                     room = Room(
                         roomId = roomId,
                         hostId = player.playerId,
-                        participantList = mutableListOf(),
+                        participantList = mutableSetOf(),
                         roomStatus = RoomStatus.WAIT,
                         writeTime = 0L,
                         questionNumber = 0
                     ),
-                    sessions = mutableSetOf()
+                    sessions = mutableSetOf(),
+                    writeCompletePlayer = mutableSetOf(),
+                    answerCompletePlayer = mutableSetOf()
                 )
             }
             application.log.info("대기실 데이터: $currentRoom")
@@ -79,9 +81,22 @@ fun Application.webSocketRoute() {
                                 }
                                 MessageType.SEND_WRITE_END -> {
                                     application.log.info("▶️ 질문 작성 완료 메시지 수신 ${message.senderId}")
+                                    if (!currentRoom.writeCompletePlayer.contains(element = message.senderId!!)) {
+                                        currentRoom.writeCompletePlayer.add(element = message.senderId)
+
+                                    }
+                                    if (currentRoom.writeCompletePlayer.size == currentRoom.sessions.size) {
+                                        currentRoom.room.roomStatus = RoomStatus.ANSWER
+                                        updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
+                                    }
                                 }
                                 MessageType.SEND_ANSWER_END -> {
                                     application.log.info("▶️ 답변 완료 메시지 수신 ${message.senderId}")
+//                                    currentRoom.answerCompletePlayer.add(element = message.senderId!!)
+//                                    if (currentRoom.answerCompletePlayer.size == currentRoom.sessions.size) {
+//                                        currentRoom.room.roomStatus = RoomStatus.END
+//                                        updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
+//                                    }
                                 }
 
                                 else -> {
