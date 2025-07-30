@@ -18,7 +18,7 @@ fun Room.toDto(): RoomDto =
     RoomDto(
         roomId = roomId,
         hostId = hostId,
-        participantList = participantList.map { it.toDto()},
+        participantList = participantList.map { it.toDto()}.toMutableSet(),
         roomStatus = roomStatus,
         writeTime = writeTime,
         questionNumber = questionNumber
@@ -27,7 +27,7 @@ fun Room.toDto(): RoomDto =
 fun MessageDto.toDomain(): Message =
     Message(
         type = type,
-        senderId = senderId,
+        playerId = playerId,
         data = data,
         timestamp = timestamp
     )
@@ -35,7 +35,7 @@ fun MessageDto.toDomain(): Message =
 fun Message.toDto(): MessageDto =
     MessageDto(
         type = type,
-        senderId = senderId,
+        playerId = playerId,
         data = data,
         timestamp = timestamp
     )
@@ -44,8 +44,24 @@ fun RoomDto.toDomain(): Room =
     Room(
         roomId = roomId,
         hostId = hostId,
-        participantList = participantList.map { it.toDomain() }.toMutableList(),
+        participantList = participantList.map { it.toDomain() }.toMutableSet(),
         roomStatus = roomStatus,
         writeTime = writeTime,
         questionNumber = questionNumber
+    )
+
+fun QuestionDto.toDomain(): Question =
+    Question(
+        playerId = playerId,
+        question = question,
+        oVoters = oVoters,
+        xVoters = xVoters
+    )
+
+fun Question.toDto(): QuestionDto =
+    QuestionDto(
+        playerId = playerId,
+        question = question,
+        oVoters = oVoters,
+        xVoters = xVoters
     )

@@ -46,8 +46,9 @@ fun Application.webSocketRoute() {
                         questionNumber = 0
                     ),
                     sessions = mutableSetOf(),
-                    writeCompletePlayer = mutableSetOf(),
-                    answerCompletePlayer = mutableSetOf()
+                    writeCompletePlayerList = mutableSetOf(),
+                    answerCompletePlayer = mutableSetOf(),
+                    questionList = mutableSetOf()
                 )
             }
             application.log.info("대기실 데이터: $currentRoom")
@@ -71,27 +72,30 @@ fun Application.webSocketRoute() {
 
                             when (message.type) {
                                 MessageType.SEND_START -> {
-                                    application.log.info("▶️ 시작 메시지 수신")
-                                    if (message.senderId == currentRoom.room.hostId) {
+                                    if (message.playerId == currentRoom.room.hostId) {
+                                        application.log.info("▶️ 시작 메시지 수신")
                                         currentRoom.room.roomStatus = RoomStatus.WRITE
-                                        currentRoom.room.writeTime = 3600L
+                                        currentRoom.room.writeTime = 3000L
                                         currentRoom.room.questionNumber = 3
                                         updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
                                     }
                                 }
                                 MessageType.SEND_WRITE_END -> {
-                                    application.log.info("▶️ 질문 작성 완료 메시지 수신 ${message.senderId}")
-                                    if (!currentRoom.writeCompletePlayer.contains(element = message.senderId!!)) {
-                                        currentRoom.writeCompletePlayer.add(element = message.senderId)
-
+                                    application.log.info("▶️ 질문 작성 완료 메시지 수신 ${message.playerId}")
+                                    if (!currentRoom.writeCompletePlayerList.contains(element = message.playerId!!)) {
+                                        currentRoom.writeCompletePlayerList.add(element = message.playerId)
+                                        application.log.info("▶️ 질문 작성 완료 메시지 수신1232 ${message.data!!}")
+                                        val questionList = Json.decodeFromString<List<QuestionDto>>(message.data!!).map { it.toDomain() }
+                                        currentRoom.questionList.addAll(questionList)
+                                        application.log.info("▶️ 질문 목록 ${currentRoom.questionList}")
                                     }
-                                    if (currentRoom.writeCompletePlayer.size == currentRoom.sessions.size) {
+                                    if (currentRoom.writeCompletePlayerList.size == currentRoom.sessions.size) {
                                         currentRoom.room.roomStatus = RoomStatus.ANSWER
                                         updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
                                     }
                                 }
                                 MessageType.SEND_ANSWER_END -> {
-                                    application.log.info("▶️ 답변 완료 메시지 수신 ${message.senderId}")
+                                    application.log.info("▶️ 답변 완료 메시지 수신 ${message.playerId}")
 //                                    currentRoom.answerCompletePlayer.add(element = message.senderId!!)
 //                                    if (currentRoom.answerCompletePlayer.size == currentRoom.sessions.size) {
 //                                        currentRoom.room.roomStatus = RoomStatus.END
