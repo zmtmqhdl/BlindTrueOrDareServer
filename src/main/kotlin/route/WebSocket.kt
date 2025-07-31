@@ -43,12 +43,12 @@ fun Application.webSocketRoute() {
                         participantList = mutableSetOf(),
                         roomStatus = RoomStatus.WAIT,
                         writeTime = 0L,
-                        questionNumber = 0
+                        questionNumber = 0,
+                        questionList = mutableListOf()
                     ),
                     sessions = mutableSetOf(),
                     writeCompletePlayerList = mutableSetOf(),
                     answerCompletePlayer = mutableSetOf(),
-                    questionList = mutableSetOf()
                 )
             }
             application.log.info("대기실 데이터: $currentRoom")
@@ -84,23 +84,39 @@ fun Application.webSocketRoute() {
                                     application.log.info("▶️ 질문 작성 완료 메시지 수신 ${message.playerId}")
                                     if (!currentRoom.writeCompletePlayerList.contains(element = message.playerId!!)) {
                                         currentRoom.writeCompletePlayerList.add(element = message.playerId)
-                                        application.log.info("▶️ 질문 작성 완료 메시지 수신1232 ${message.data!!}")
                                         val questionList = Json.decodeFromString<List<QuestionDto>>(message.data!!).map { it.toDomain() }
-                                        currentRoom.questionList.addAll(questionList)
-                                        application.log.info("▶️ 질문 목록 ${currentRoom.questionList}")
+                                        val newQuestionList = questionList.mapIndexed { index, question ->
+                                            question.copy(questionId = (currentRoom.room.questionList.size + index + 1).toLong())
+                                        }
+                                        currentRoom.room.questionList.addAll(newQuestionList)
+                                        application.log.info("▶️ 질문 목록 ${currentRoom.room.questionList}")
                                     }
                                     if (currentRoom.writeCompletePlayerList.size == currentRoom.sessions.size) {
+                                        currentRoom.room.questionList.shuffle()
                                         currentRoom.room.roomStatus = RoomStatus.ANSWER
                                         updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
                                     }
                                 }
                                 MessageType.SEND_ANSWER_END -> {
                                     application.log.info("▶️ 답변 완료 메시지 수신 ${message.playerId}")
-//                                    currentRoom.answerCompletePlayer.add(element = message.senderId!!)
-//                                    if (currentRoom.answerCompletePlayer.size == currentRoom.sessions.size) {
-//                                        currentRoom.room.roomStatus = RoomStatus.END
-//                                        updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
-//                                    }
+                                    if (!currentRoom.answerCompletePlayer.contains(element = message.playerId!!)) {
+                                        currentRoom.answerCompletePlayer.add(element = message.playerId)
+                                        val answerList =
+                                            Json.decodeFromString<List<AnswerDto>>(message.data!!).map { it.toDomain() }
+                                        answerList.forEach { answer ->
+                                            val index = currentRoom.room.questionList.indexOfFirst { it.questionId == answer.questionId }
+                                            if (answer.answer) {
+                                                currentRoom.room.questionList[index].oVoters.add(element = answer.playerId)
+                                            } else {
+                                                currentRoom.room.questionList[index].xVoters.add(element = answer.playerId)
+                                            }
+                                        }
+                                        application.log.info("▶️ 질문 목록 ${currentRoom.room.questionList}")
+                                    }
+                                    if (currentRoom.answerCompletePlayer.size == currentRoom.sessions.size) {
+                                        currentRoom.room.roomStatus = RoomStatus.END
+                                        updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
+                                    }
                                 }
 
                                 else -> {

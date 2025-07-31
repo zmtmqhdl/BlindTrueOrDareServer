@@ -32,7 +32,8 @@ data class Room(
     val participantList: MutableSet<Player>,
     var roomStatus: RoomStatus,
     var writeTime: Long,
-    var questionNumber: Int
+    var questionNumber: Long,
+    var questionList: MutableList<Question>
 )
 
 @Serializable
@@ -42,10 +43,12 @@ data class RoomDto(
     val participantList: Set<PlayerDto>,
     val roomStatus: RoomStatus,
     val writeTime: Long,
-    val questionNumber: Int
+    val questionNumber: Long,
+    val questionList: List<QuestionDto>
 )
 
 data class Question(
+    var questionId: Long,
     val playerId: String,
     val question: String,
     val oVoters: MutableSet<String>,
@@ -54,10 +57,24 @@ data class Question(
 
 @Serializable
 data class QuestionDto(
+    val questionId: Long,
     val playerId: String,
     val question: String,
     val oVoters: Set<String>,
     val xVoters: Set<String>
+)
+
+data class Answer(
+    val questionId: Long,
+    val playerId: String,
+    val answer: Boolean
+)
+
+@Serializable
+data class AnswerDto(
+    val questionId: Long,
+    val playerId: String,
+    val answer: Boolean
 )
 
 data class RoomData(
@@ -65,7 +82,6 @@ data class RoomData(
     var sessions: MutableSet<DefaultWebSocketServerSession>,
     var writeCompletePlayerList: MutableSet<String>,
     var answerCompletePlayer: MutableSet<String>,
-    var questionList: MutableSet<Question>
 )
 
 
