@@ -28,7 +28,7 @@ data class CreateRoomResponse(
 
 data class Room(
     val roomId: String,
-    val hostId: String,
+    var host: Player,
     val participantList: MutableSet<Player>,
     var roomStatus: RoomStatus,
     var writeTime: Long,
@@ -39,7 +39,7 @@ data class Room(
 @Serializable
 data class RoomDto(
     val roomId: String,
-    val hostId: String,
+    val host: PlayerDto,
     val participantList: Set<PlayerDto>,
     val roomStatus: RoomStatus,
     val writeTime: Long,
@@ -67,14 +67,14 @@ data class QuestionDto(
 data class Answer(
     val questionId: Long,
     val playerId: String,
-    val answer: Boolean
+    val answer: Boolean?
 )
 
 @Serializable
 data class AnswerDto(
     val questionId: Long,
     val playerId: String,
-    val answer: Boolean
+    val answer: Boolean?
 )
 
 data class RoomData(
@@ -88,6 +88,7 @@ data class RoomData(
 
 enum class RoomStatus {
     WAIT,
+    READY,
     WRITE,
     ANSWER,
     END

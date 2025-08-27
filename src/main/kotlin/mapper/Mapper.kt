@@ -17,7 +17,7 @@ fun Player.toDto(): PlayerDto =
 fun Room.toDto(): RoomDto =
     RoomDto(
         roomId = roomId,
-        hostId = hostId,
+        host = host.toDto(),
         participantList = participantList.map { it.toDto()}.toMutableSet(),
         roomStatus = roomStatus,
         writeTime = writeTime,
@@ -44,7 +44,7 @@ fun Message.toDto(): MessageDto =
 fun RoomDto.toDomain(): Room =
     Room(
         roomId = roomId,
-        hostId = hostId,
+        host = host.toDomain(),
         participantList = participantList.map { it.toDomain() }.toMutableSet(),
         roomStatus = roomStatus,
         writeTime = writeTime,
