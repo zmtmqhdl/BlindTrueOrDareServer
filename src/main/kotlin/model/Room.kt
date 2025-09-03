@@ -91,5 +91,5 @@ enum class RoomStatus {
     READY,
     WRITE,
     ANSWER,
-    END
+    RESULT
 }

@@ -5,7 +5,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.DefaultWebSocketServerSession
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.*
-import kotlinx.coroutines.delay
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.example.mapper.toDomain
@@ -25,13 +24,13 @@ fun Application.webSocketRoute() {
                 try {
                     Json.decodeFromString<PlayerDto>(it).toDomain()
                 } catch (e: Exception) {
-                    application.log.error("❌ Player 디코딩 실패: ${e.message}", e)
+                    application.log.error("❌ Failed to decode Player: ${e.message}", e)
                     null
                 }
             }
 
             if (roomId == null || player == null) {
-                application.log.warn("WebSocket 연결 실패 - 파라미터 누락: waitingRoomId=$roomId, player=$player")
+                application.log.warn("WebSocket connection failed - Missing parameters: roomId=$roomId, player=$player")
                 close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Missing parameters"))
                 return@webSocket
             }
@@ -52,17 +51,17 @@ fun Application.webSocketRoute() {
                     answerCompletePlayer = mutableSetOf(),
                 )
             }
-            application.log.info("대기실 데이터: $currentRoom")
+            application.log.info("Room data: $currentRoom")
             currentRoom.sessions += this
 
-            // 새로운 유저 입장
+            // New player joined
             if (!currentRoom.room.participantList.map { it.playerId }.contains(player.playerId)) {
                 currentRoom.room.participantList.add(player)
-                application.log.info("플레이어 추가됨: ${player.playerId} -> 방 ID: $roomId")
+                application.log.info("Player added: ${player.playerId} -> Room ID: $roomId")
 
                 updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
             }
-            application.log.info("✅ WebSocket 연결 완료: ${player.playerId}")
+            application.log.info("✅ WebSocket connection established: ${player.playerId}")
 
             try {
                 for (frame in incoming) {
@@ -74,35 +73,32 @@ fun Application.webSocketRoute() {
                             when (message.type) {
                                 MessageType.SEND_START -> {
                                     if (message.playerId == currentRoom.room.host.playerId) {
-                                        application.log.info("▶️ 시작 메시지 수신")
-                                        currentRoom.room.roomStatus = RoomStatus.READY
-                                        currentRoom.room.writeTime = 3000L
-                                        currentRoom.room.questionNumber = 3
-                                        updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
-                                        delay(5000L)
+                                        application.log.info("▶️ Start message received")
                                         currentRoom.room.roomStatus = RoomStatus.WRITE
+                                        currentRoom.room.writeTime = 30L
+                                        currentRoom.room.questionNumber = 3
                                         updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
                                     }
                                 }
                                 MessageType.SEND_WRITE_END -> {
-                                    application.log.info("▶️ 질문 작성 완료 메시지 수신 ${message.playerId}")
+                                    application.log.info("▶️ Write completed message received ${message.playerId}")
                                     if (!currentRoom.writeCompletePlayerList.contains(element = message.playerId!!)) {
                                         currentRoom.writeCompletePlayerList.add(element = message.playerId)
                                         val questionList = Json.decodeFromString<List<QuestionDto>>(message.data!!).map { it.toDomain() }
                                         val newQuestionList = questionList.mapIndexed { index, question ->
                                             question.copy(questionId = (currentRoom.room.questionList.size + index + 1).toLong())
                                         }
-                                        currentRoom.room.questionList.addAll(newQuestionList.filter{ it.question.isNotEmpty()})
-                                        application.log.info("▶️ 질문 목록 ${currentRoom.room.questionList}")
+                                        currentRoom.room.questionList.addAll(newQuestionList.filter { it.question.isNotEmpty() })
+                                        application.log.info("▶️ Question list ${currentRoom.room.questionList}")
                                     }
-                                    if (currentRoom.writeCompletePlayerList.size == currentRoom.sessions.size) {
+                                    if (currentRoom.writeCompletePlayerList.size == currentRoom.room.participantList.size) {
                                         currentRoom.room.questionList.shuffle()
                                         currentRoom.room.roomStatus = RoomStatus.ANSWER
                                         updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
                                     }
                                 }
                                 MessageType.SEND_ANSWER_END -> {
-                                    application.log.info("▶️ 답변 완료 메시지 수신 ${message.playerId}")
+                                    application.log.info("▶️ Answer completed message received ${message.playerId}")
                                     if (!currentRoom.answerCompletePlayer.contains(element = message.playerId!!)) {
                                         currentRoom.answerCompletePlayer.add(element = message.playerId)
                                         val answerList =
@@ -115,10 +111,10 @@ fun Application.webSocketRoute() {
                                                 currentRoom.room.questionList[index].xVoters.add(element = answer.playerId)
                                             }
                                         }
-                                        application.log.info("▶️ 질문 목록 ${currentRoom.room.questionList}")
+                                        application.log.info("▶️ Question list ${currentRoom.room.questionList}")
                                     }
-                                    if (currentRoom.answerCompletePlayer.size == currentRoom.sessions.size) {
-                                        currentRoom.room.roomStatus = RoomStatus.END
+                                    if (currentRoom.answerCompletePlayer.size == currentRoom.room.participantList.size) {
+                                        currentRoom.room.roomStatus = RoomStatus.RESULT
                                         updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
                                     }
                                 }
@@ -133,16 +129,23 @@ fun Application.webSocketRoute() {
                     }
                 }
             } catch (e: Exception) {
-                application.log.error("⚠️ WebSocket 에러: ${e.message}", e)
+                application.log.error("⚠️ WebSocket error: ${e.message}", e)
             } finally {
-                application.log.info("🔌 end: ${player.playerId}")
+                application.log.info("🔌 Disconnected: ${player.playerId}")
                 currentRoom.sessions -= this
                 currentRoom.room.participantList.remove(player)
-                if (player == currentRoom.room.host) {
+
+                if (player == currentRoom.room.host && currentRoom.room.participantList.isNotEmpty()) {
                     currentRoom.room.host = currentRoom.room.participantList.first()
-                    application.log.info("🔌 host change: ${currentRoom.room}")
+                    application.log.info("🔌 Host changed: ${currentRoom.room}")
                 }
-                updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
+
+                if (currentRoom.sessions.isEmpty()) {
+                    roomSessions.remove(roomId)
+                    application.log.info("🗑️ Room removed: $roomId (no players left)")
+                } else {
+                    updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
+                }
             }
         }
     }
