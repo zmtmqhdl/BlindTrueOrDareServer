@@ -49,46 +49,47 @@ data class RoomDto(
 
 data class Question(
     var questionId: Long,
-    val playerId: String,
+    val player: Player,
     val question: String,
-    val oVoters: MutableSet<String>,
-    val xVoters: MutableSet<String>
+    val oVoter: MutableSet<Player>,
+    val xVoter: MutableSet<Player>,
+    val skipper: MutableSet<Player>
 )
 
 @Serializable
 data class QuestionDto(
     val questionId: Long,
-    val playerId: String,
+    val player: PlayerDto,
     val question: String,
-    val oVoters: Set<String>,
-    val xVoters: Set<String>
+    val oVoter: Set<PlayerDto>,
+    val xVoter: Set<PlayerDto>,
+    val skipper: Set<PlayerDto>
 )
 
 data class Answer(
     val questionId: Long,
-    val playerId: String,
+    val player: Player,
     val answer: Boolean?
 )
 
 @Serializable
 data class AnswerDto(
     val questionId: Long,
-    val playerId: String,
+    val player: PlayerDto,
     val answer: Boolean?
 )
 
 data class RoomData(
     val room: Room,
     var sessions: MutableSet<DefaultWebSocketServerSession>,
-    var writeCompletePlayerList: MutableSet<String>,
-    var answerCompletePlayer: MutableSet<String>,
+    var writeCompletePlayerList: MutableSet<Player>,
+    var answerCompletePlayerList: MutableSet<Player>,
 )
 
 
 
 enum class RoomStatus {
     WAIT,
-    READY,
     WRITE,
     ANSWER,
     RESULT

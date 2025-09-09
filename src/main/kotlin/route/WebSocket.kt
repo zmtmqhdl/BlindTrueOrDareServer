@@ -48,7 +48,7 @@ fun Application.webSocketRoute() {
                     ),
                     sessions = mutableSetOf(),
                     writeCompletePlayerList = mutableSetOf(),
-                    answerCompletePlayer = mutableSetOf(),
+                    answerCompletePlayerList = mutableSetOf(),
                 )
             }
             application.log.info("Room data: $currentRoom")
@@ -72,7 +72,7 @@ fun Application.webSocketRoute() {
 
                             when (message.type) {
                                 MessageType.SEND_START -> {
-                                    if (message.playerId == currentRoom.room.host.playerId) {
+                                    if (message.player?.playerId == currentRoom.room.host.playerId) {
                                         application.log.info("▶️ Start message received")
                                         currentRoom.room.roomStatus = RoomStatus.WRITE
                                         currentRoom.room.writeTime = 30L
@@ -81,9 +81,9 @@ fun Application.webSocketRoute() {
                                     }
                                 }
                                 MessageType.SEND_WRITE_END -> {
-                                    application.log.info("▶️ Write completed message received ${message.playerId}")
-                                    if (!currentRoom.writeCompletePlayerList.contains(element = message.playerId!!)) {
-                                        currentRoom.writeCompletePlayerList.add(element = message.playerId)
+                                    application.log.info("▶️ Write completed message received ${message.player}")
+                                    if (!currentRoom.writeCompletePlayerList.contains(element = message.player!!)) {
+                                        currentRoom.writeCompletePlayerList.add(element = message.player)
                                         val questionList = Json.decodeFromString<List<QuestionDto>>(message.data!!).map { it.toDomain() }
                                         val newQuestionList = questionList.mapIndexed { index, question ->
                                             question.copy(questionId = (currentRoom.room.questionList.size + index + 1).toLong())
@@ -98,22 +98,24 @@ fun Application.webSocketRoute() {
                                     }
                                 }
                                 MessageType.SEND_ANSWER_END -> {
-                                    application.log.info("▶️ Answer completed message received ${message.playerId}")
-                                    if (!currentRoom.answerCompletePlayer.contains(element = message.playerId!!)) {
-                                        currentRoom.answerCompletePlayer.add(element = message.playerId)
+                                    application.log.info("▶️ Answer completed message received ${message.player}")
+                                    if (!currentRoom.answerCompletePlayerList.contains(element = message.player!!)) {
+                                        currentRoom.answerCompletePlayerList.add(element = message.player)
                                         val answerList =
                                             Json.decodeFromString<List<AnswerDto>>(message.data!!).map { it.toDomain() }
                                         answerList.forEach { answer ->
                                             val index = currentRoom.room.questionList.indexOfFirst { it.questionId == answer.questionId }
                                             if (answer.answer == true) {
-                                                currentRoom.room.questionList[index].oVoters.add(element = answer.playerId)
+                                                currentRoom.room.questionList[index].oVoter.add(element = answer.player)
                                             } else if (answer.answer == false) {
-                                                currentRoom.room.questionList[index].xVoters.add(element = answer.playerId)
+                                                currentRoom.room.questionList[index].xVoter.add(element = answer.player)
+                                            } else {
+                                                currentRoom.room.questionList[index].xVoter.add(element = answer.player)
                                             }
                                         }
                                         application.log.info("▶️ Question list ${currentRoom.room.questionList}")
                                     }
-                                    if (currentRoom.answerCompletePlayer.size == currentRoom.room.participantList.size) {
+                                    if (currentRoom.answerCompletePlayerList.size == currentRoom.room.participantList.size) {
                                         currentRoom.room.roomStatus = RoomStatus.RESULT
                                         updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
                                     }

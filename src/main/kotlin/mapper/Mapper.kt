@@ -18,7 +18,7 @@ fun Room.toDto(): RoomDto =
     RoomDto(
         roomId = roomId,
         host = host.toDto(),
-        participantList = participantList.map { it.toDto()}.toMutableSet(),
+        participantList = participantList.map { it.toDto() }.toMutableSet(),
         roomStatus = roomStatus,
         writeTime = writeTime,
         questionNumber = questionNumber,
@@ -28,7 +28,7 @@ fun Room.toDto(): RoomDto =
 fun MessageDto.toDomain(): Message =
     Message(
         type = type,
-        playerId = playerId,
+        player = player?.toDomain(),
         data = data,
         timestamp = timestamp
     )
@@ -36,50 +36,34 @@ fun MessageDto.toDomain(): Message =
 fun Message.toDto(): MessageDto =
     MessageDto(
         type = type,
-        playerId = playerId,
+        player = player?.toDto(),
         data = data,
         timestamp = timestamp
-    )
-
-fun RoomDto.toDomain(): Room =
-    Room(
-        roomId = roomId,
-        host = host.toDomain(),
-        participantList = participantList.map { it.toDomain() }.toMutableSet(),
-        roomStatus = roomStatus,
-        writeTime = writeTime,
-        questionNumber = questionNumber,
-        questionList = questionList.map { it.toDomain()}.toMutableList()
     )
 
 fun QuestionDto.toDomain(): Question =
     Question(
         questionId = questionId,
-        playerId = playerId,
+        player = player.toDomain(),
         question = question,
-        oVoters = oVoters.toMutableSet(),
-        xVoters = xVoters.toMutableSet()
+        oVoter = oVoter.map { it.toDomain() }.toMutableSet(),
+        xVoter = xVoter.map { it.toDomain() }.toMutableSet(),
+        skipper = skipper.map { it.toDomain() }.toMutableSet()
     )
 
 fun Question.toDto(): QuestionDto =
     QuestionDto(
         questionId = questionId,
-        playerId = playerId,
+        player = player.toDto(),
         question = question,
-        oVoters = oVoters,
-        xVoters = xVoters
-    )
-
-fun Answer.toDto(): AnswerDto =
-    AnswerDto(
-        questionId = questionId,
-        playerId = playerId,
-        answer = answer
+        oVoter = oVoter.map { it.toDto() }.toSet(),
+        xVoter = xVoter.map { it.toDto() }.toSet(),
+        skipper = skipper.map { it.toDto() }.toSet()
     )
 
 fun AnswerDto.toDomain(): Answer =
     Answer(
         questionId = questionId,
-        playerId = playerId,
+        player = player.toDomain(),
         answer = answer
     )

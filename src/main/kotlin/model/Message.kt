@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 data class Message(
     val type: MessageType,
-    val playerId: String? = null,
+    val player: Player? = null,
     val data: String? = null,
     val timestamp: Long
 )
@@ -12,7 +12,7 @@ data class Message(
 @Serializable
 data class MessageDto(
     val type: MessageType,
-    val playerId: String? = null,
+    val player: PlayerDto? = null,
     val data: String? = null,
     val timestamp: Long
 )
