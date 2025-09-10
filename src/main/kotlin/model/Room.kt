@@ -53,7 +53,7 @@ data class Question(
     val question: String,
     val oVoter: MutableSet<Player>,
     val xVoter: MutableSet<Player>,
-    val skipper: MutableSet<Player>
+    val noAnswer: MutableSet<Player>
 )
 
 @Serializable
@@ -63,7 +63,7 @@ data class QuestionDto(
     val question: String,
     val oVoter: Set<PlayerDto>,
     val xVoter: Set<PlayerDto>,
-    val skipper: Set<PlayerDto>
+    val noAnswer: Set<PlayerDto>
 )
 
 data class Answer(

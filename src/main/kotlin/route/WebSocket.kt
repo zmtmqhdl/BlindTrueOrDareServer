@@ -76,7 +76,7 @@ fun Application.webSocketRoute() {
                                         application.log.info("▶️ Start message received")
                                         currentRoom.room.roomStatus = RoomStatus.WRITE
                                         currentRoom.room.writeTime = 30L
-                                        currentRoom.room.questionNumber = 3
+                                        currentRoom.room.questionNumber = 1
                                         updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
                                     }
                                 }
@@ -93,7 +93,12 @@ fun Application.webSocketRoute() {
                                     }
                                     if (currentRoom.writeCompletePlayerList.size == currentRoom.room.participantList.size) {
                                         currentRoom.room.questionList.shuffle()
-                                        currentRoom.room.roomStatus = RoomStatus.ANSWER
+                                        if (currentRoom.room.questionList.isEmpty()) {
+                                            currentRoom.room.roomStatus = RoomStatus.RESULT
+                                        } else {
+                                            currentRoom.room.roomStatus = RoomStatus.ANSWER
+
+                                        }
                                         updateMessage(sessions = currentRoom.sessions, room = currentRoom.room)
                                     }
                                 }

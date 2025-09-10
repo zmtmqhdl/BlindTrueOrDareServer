@@ -48,7 +48,7 @@ fun QuestionDto.toDomain(): Question =
         question = question,
         oVoter = oVoter.map { it.toDomain() }.toMutableSet(),
         xVoter = xVoter.map { it.toDomain() }.toMutableSet(),
-        skipper = skipper.map { it.toDomain() }.toMutableSet()
+        noAnswer = noAnswer.map { it.toDomain() }.toMutableSet()
     )
 
 fun Question.toDto(): QuestionDto =
@@ -58,7 +58,7 @@ fun Question.toDto(): QuestionDto =
         question = question,
         oVoter = oVoter.map { it.toDto() }.toSet(),
         xVoter = xVoter.map { it.toDto() }.toSet(),
-        skipper = skipper.map { it.toDto() }.toSet()
+        noAnswer = noAnswer.map { it.toDto() }.toSet()
     )
 
 fun AnswerDto.toDomain(): Answer =
