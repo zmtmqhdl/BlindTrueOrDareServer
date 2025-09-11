@@ -147,13 +147,9 @@ fun Application.webSocketRoute() {
                                 MessageType.REJOIN -> {
                                     application.log.info("🔄 Player rejoined: ${player.nickname} in room=$roomId")
 
-
-
-                                    // 2. 새 세션 등록 (먼저 교체)
                                     currentRoom.room.participantList.add(player)
 
-                                    // 3. 전체 유저에게 UPDATE 브로드캐스트
-                                    updateMessage(
+                                    rejoinMessage(
                                         sessions = currentRoom.room.participantList.mapNotNull { currentRoom.sessions[it.playerId] },
                                         room = currentRoom.room
                                     )
@@ -200,6 +196,15 @@ fun Application.webSocketRoute() {
 suspend fun updateMessage(sessions: Collection<DefaultWebSocketServerSession>, room: Room) {
     val message = Message(
         type = MessageType.UPDATE,
+        data = Json.encodeToString(room.toDto()),
+        timestamp = System.currentTimeMillis()
+    ).toDto()
+    sessions.forEach { it.send(Json.encodeToString(message)) }
+}
+
+suspend fun rejoinMessage(sessions: Collection<DefaultWebSocketServerSession>, room: Room) {
+    val message = Message(
+        type = MessageType.REJOIN,
         data = Json.encodeToString(room.toDto()),
         timestamp = System.currentTimeMillis()
     ).toDto()
