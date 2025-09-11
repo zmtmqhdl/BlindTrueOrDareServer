@@ -29,7 +29,7 @@ data class CreateRoomResponse(
 data class Room(
     val roomId: String,
     var host: Player,
-    val participantList: MutableSet<Player>,
+    var participantList: MutableSet<Player>,
     var roomStatus: RoomStatus,
     var writeTime: Long,
     var questionNumber: Long,
@@ -81,7 +81,7 @@ data class AnswerDto(
 
 data class RoomData(
     val room: Room,
-    var sessions: MutableSet<DefaultWebSocketServerSession>,
+    val sessions: MutableMap<String, DefaultWebSocketServerSession>,
     var writeCompletePlayerList: MutableSet<Player>,
     var answerCompletePlayerList: MutableSet<Player>,
 )
