@@ -7,14 +7,13 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
-import org.example.database.connectToDatabase
 import org.example.route.room
 import org.example.route.webSocketRoute
 import java.time.Duration
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 fun main() {
-    connectToDatabase()
+//    connectToDatabase()
 
     embeddedServer(Netty, port = 8080) {
         install(ContentNegotiation) { json() }
