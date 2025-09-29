@@ -1,17 +1,8 @@
 plugins {
-    kotlin("jvm") version "2.1.20"
-    kotlin("plugin.serialization") version "1.9.0"
+    kotlin("jvm") version "1.9.22"
+    kotlin("plugin.serialization") version "1.9.22"
     application
-
     id("com.github.johnrengelman.shadow") version "8.1.1"
-}
-
-tasks {
-    shadowJar {
-        archiveBaseName.set("app")
-        archiveClassifier.set("")
-        archiveVersion.set("")
-    }
 }
 
 group = "org.example"
@@ -28,16 +19,14 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:2.3.5")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.5")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    implementation("org.jetbrains.exposed:exposed-core:0.45.0")
-    implementation("org.jetbrains.exposed:exposed-dao:0.45.0")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.45.0")
-    implementation("org.jetbrains.exposed:exposed-java-time:0.45.0")
-    implementation("org.postgresql:postgresql:42.7.2")
+
+    // Exposed + Postgres 최신 버전만 사용
     implementation("org.jetbrains.exposed:exposed-core:0.50.1")
     implementation("org.jetbrains.exposed:exposed-dao:0.50.1")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.50.1")
     implementation("org.jetbrains.exposed:exposed-java-time:0.50.1")
     implementation("org.postgresql:postgresql:42.7.3")
+
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("org.slf4j:slf4j-simple:2.0.12")
 
@@ -49,5 +38,13 @@ application {
 }
 
 kotlin {
-    jvmToolchain(22)
+    jvmToolchain(17)
+}
+
+tasks {
+    shadowJar {
+        archiveBaseName.set("app")
+        archiveClassifier.set("")
+        archiveVersion.set("")
+    }
 }
