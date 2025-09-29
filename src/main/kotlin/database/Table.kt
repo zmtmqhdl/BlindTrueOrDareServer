@@ -1,8 +1,8 @@
 package org.example.database
 
-import org.example.model.RoomStatus
-import org.jetbrains.exposed.sql.ReferenceOption
-import org.jetbrains.exposed.sql.Table
+//import org.example.model.RoomStatus
+//import org.jetbrains.exposed.sql.ReferenceOption
+//import org.jetbrains.exposed.sql.Table
 
 //object Player : Table("player") {
 //    val playerId = uuid("player_id")
