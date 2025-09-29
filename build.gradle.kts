@@ -34,7 +34,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("MainKt")
+    mainClass.set("org.example.MainKt")
 }
 
 kotlin {
@@ -46,5 +46,9 @@ tasks {
         archiveBaseName.set("app")
         archiveClassifier.set("")
         archiveVersion.set("")
+
+        manifest {
+            attributes["Main-Class"] = "org.example.MainKt"
+        }
     }
 }
