@@ -21,13 +21,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // Exposed + Postgres 최신 버전만 사용
-    implementation("org.jetbrains.exposed:exposed-core:0.50.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.50.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.50.1")
-    implementation("org.jetbrains.exposed:exposed-java-time:0.50.1")
-    implementation("org.postgresql:postgresql:42.7.3")
+//    implementation("org.jetbrains.exposed:exposed-core:0.50.1")
+//    implementation("org.jetbrains.exposed:exposed-dao:0.50.1")
+//    implementation("org.jetbrains.exposed:exposed-jdbc:0.50.1")
+//    implementation("org.jetbrains.exposed:exposed-java-time:0.50.1")
+//    implementation("org.postgresql:postgresql:42.7.3")
+//    implementation("com.zaxxer:HikariCP:5.1.0")
 
-    implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("org.slf4j:slf4j-simple:2.0.12")
 
     testImplementation(kotlin("test"))
