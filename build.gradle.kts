@@ -2,6 +2,16 @@ plugins {
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.serialization") version "1.9.0"
     application
+
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+}
+
+tasks {
+    shadowJar {
+        archiveBaseName.set("app")
+        archiveClassifier.set("")
+        archiveVersion.set("")
+    }
 }
 
 group = "org.example"
